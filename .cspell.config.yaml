@@ -1,0 +1,23 @@
+version: "0.2"
+language: en
+dictionaries:
+  - project-words
+  - bash
+  - shellscript
+  - git
+  - golang
+  - html
+  - css
+  - npm
+  - node
+  - typescript
+  - python
+  - docker
+  - k8s
+  - terraform
+  - fonts
+  - latex
+dictionaryDefinitions:
+  - name: project-words
+    path: .cspell/project-words.txt
+    addWords: true
