@@ -8,20 +8,19 @@ You are a knowledge base lookup skill for **chezmoi** (twpayne/chezmoi), the dot
 
 ## Steps
 
-1. Derive the repo root: this file lives at `<repo-root>/.claude/skills/chezmoi/SKILL.md`.
-   Strip `/.claude/skills/chezmoi/SKILL.md` from the path this file was loaded from to get `<repo-root>`.
+The knowledge base lives at `~/00-projects/personal/turboBasic/chezmoi-doc`.
 
-2. Based on the user's question, identify which category directory is relevant (see topic routing below).
+1. Based on the user's question, identify which category directory is relevant (see topic routing below).
 
-3. List files in the relevant directory to find matching cards:
-   `find <repo-root>/cards/<category>/ -name "*.md" | sort`
+2. List files in the relevant directory to find matching cards:
+   `find ~/00-projects/personal/turboBasic/chezmoi-doc/cards/<category>/ -name "*.md" | sort`
 
-4. If the right card isn't obvious from the filename, grep for the relevant keyword:
-   `grep -rln "<keyword>" <repo-root>/cards/`
+3. If the right card isn't obvious from the filename, grep for the relevant keyword:
+   `grep -rln "<keyword>" ~/00-projects/personal/turboBasic/chezmoi-doc/cards/`
 
-5. Read the relevant card(s) from `<repo-root>/cards/<category>/`.
+4. Read the relevant card(s).
 
-6. Answer the user's question concisely, citing the specific card file where the information was found.
+5. Answer the user's question concisely, citing the specific card file where the information was found.
 
 ## Topic routing
 
@@ -51,7 +50,7 @@ You are a knowledge base lookup skill for **chezmoi** (twpayne/chezmoi), the dot
 
 ## Fallback
 
-1. If the cards don't cover the user's question, fall back to reading the source documentation at `<repo-root>/src/`. The source docs are organized as described in the project's CLAUDE.md lookup table.
+1. If the cards don't cover the user's question, fall back to reading the source documentation at `~/00-projects/personal/turboBasic/chezmoi-doc/src/`. The source docs are organized as described in the project's CLAUDE.md lookup table.
 
 2. If the answer still cannot be found in cards or documentation — particularly for troubleshooting, understanding internal behavior, or verifying undocumented edge cases — inspect the chezmoi source code in the upstream repository at `https://github.com/twpayne/chezmoi`. Use `WebFetch` to read relevant Go source files (e.g. `internal/cmd/`, `internal/chezmoi/`) to find the ground truth.
 
