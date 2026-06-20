@@ -1,60 +1,67 @@
 ---
 name: chezmoi
-description: Look up chezmoi documentation — commands, config, templates, scripts, encryption, password managers
-allowed-tools: Read, Bash(grep *)
+description: Look up chezmoi documentation — commands, concepts, configuration, templates, scripts, encryption, password managers, externals, troubleshooting, recipes
+allowed-tools: Read, Bash(grep *), Bash(find *), Bash(wc *)
 ---
 
-You are a knowledge base lookup skill for **chezmoi**. The documentation lives under `src/`.
+You are a knowledge base lookup skill for **chezmoi** (twpayne/chezmoi), the dotfile manager that manages your dotfiles across multiple machines.
 
 ## Steps
 
 1. Derive the repo root: this file lives at `<repo-root>/.claude/skills/chezmoi/SKILL.md`.
    Strip `/.claude/skills/chezmoi/SKILL.md` from the path this file was loaded from to get `<repo-root>`.
 
-2. Read the navigation table:
-   `<repo-root>/CLAUDE.md`
+2. Based on the user's question, identify which category directory is relevant (see topic routing below).
 
-3. Based on the user's question, identify which file(s) in `src/` are relevant using the lookup table.
+3. List files in the relevant directory to find matching cards:
+   `find <repo-root>/cards/<category>/ -name "*.md" | sort`
 
-4. Read those file(s) from `<repo-root>/src/`.
+4. If the right card isn't obvious from the filename, grep for the relevant keyword:
+   `grep -rln "<keyword>" <repo-root>/cards/`
 
-5. If the lookup table doesn't clearly point to the right file, grep across `src/` for the relevant keyword:
-   `grep -rn "<keyword>" <repo-root>/src/`
+5. Read the relevant card(s) from `<repo-root>/cards/<category>/`.
 
-6. Answer the user's question concisely, citing the specific file and section where the information was found.
+6. Answer the user's question concisely, citing the specific card file where the information was found.
 
 ## Topic routing
 
-| Topic                              | Primary file(s)                                                              |
-| ---------------------------------- | ---------------------------------------------------------------------------- |
-| How chezmoi works                  | `src/what-does-chezmoi-do.md`, `src/reference/concepts.md`                  |
-| Getting started / setup            | `src/quick-start.md`, `src/user-guide/setup.md`                             |
-| A specific command                 | `src/reference/commands/<cmd>.md`                                            |
-| All commands overview              | `src/reference/commands/index.md`                                            |
-| Config file options                | `src/reference/configuration-file/index.md`                                 |
-| Config variables                   | `src/reference/configuration-file/variables.md`                             |
-| Hooks (config)                     | `src/reference/configuration-file/hooks.md`                                 |
-| Templates (syntax/directives)      | `src/reference/templates/index.md`, `src/reference/templates/directives.md` |
-| Template variables                 | `src/reference/templates/variables.md`                                      |
-| Template functions                 | `src/reference/templates/functions/<fn>.md`                                 |
-| Init-time template functions       | `src/reference/templates/init-functions/`                                   |
-| Source file naming / prefixes      | `src/reference/source-state-attributes.md`                                  |
-| Target types                       | `src/reference/target-types.md`                                              |
-| Application order                  | `src/reference/application-order.md`                                        |
-| Scripts (run_*)                    | `src/user-guide/use-scripts-to-perform-actions.md`                          |
-| External files/archives            | `src/user-guide/include-files-from-elsewhere.md`                            |
-| Encryption (age/gpg/rage)          | `src/user-guide/encryption/index.md`                                        |
-| Password managers                  | `src/user-guide/password-managers/<name>.md`                                |
-| Machine differences                | `src/user-guide/manage-machine-to-machine-differences.md`                   |
-| macOS-specific                     | `src/user-guide/machines/macos.md`                                          |
-| Linux-specific                     | `src/user-guide/machines/linux.md`                                          |
-| Windows-specific                   | `src/user-guide/machines/windows.md`                                        |
-| Ignoring files                     | `src/reference/special-files/chezmoiignore.md`                              |
-| Data files                         | `src/reference/special-files/chezmoidata-format.md`                        |
-| Templating guide                   | `src/user-guide/templating.md`                                              |
-| Daily operations                   | `src/user-guide/daily-operations.md`                                        |
-| Editor / merge / diff tools        | `src/user-guide/tools/editor.md`                                            |
-| Troubleshooting / FAQ              | `src/user-guide/frequently-asked-questions/troubleshooting.md`              |
-| General FAQ                        | `src/user-guide/frequently-asked-questions/general.md`                      |
-| Migrating to chezmoi               | `src/migrating-from-another-dotfile-manager.md`                             |
-| Init workflow                      | `src/reference/commands/init.md`                                            |
+| Topic                                              | Directory                    |
+| -------------------------------------------------- | ---------------------------- |
+| CLI commands (add, apply, init, edit, diff, etc.)  | `cards/commands/`            |
+| Architecture / source state / target state         | `cards/concepts/`            |
+| Config file, hooks, editor, interpreters           | `cards/configuration/`       |
+| Templates, variables, conditionals, functions      | `cards/templates/`           |
+| Scripts (run_, run_once_, run_onchange_)           | `cards/scripts/`             |
+| External files/archives (.chezmoiexternal)         | `cards/externals/`           |
+| Encryption (age, gpg)                              | `cards/encryption/`          |
+| Password managers (1Password, Bitwarden, etc.)     | `cards/password-managers/`   |
+| Errors, debugging, broken state                    | `cards/troubleshooting/`     |
+| Install / setup / new machine                      | `cards/installation/`        |
+| How-to patterns, workflows, Docker, CI             | `cards/recipes/`             |
+
+## Answering strategy
+
+- If the question is about a specific command, check `cards/commands/` first.
+- If the question is "how do I..." or a workflow question, check `cards/recipes/` first, then relevant category.
+- If the question involves templates or conditionals, check `cards/templates/` first.
+- If the question involves an error or something not working, check `cards/troubleshooting/` first.
+- If the question involves secrets or credentials, check `cards/password-managers/` and `cards/encryption/`.
+- For questions about .chezmoiexternal or pulling files from URLs, check `cards/externals/`.
+- When multiple cards are relevant, synthesize an answer from all of them.
+
+## Fallback
+
+1. If the cards don't cover the user's question, fall back to reading the source documentation at `<repo-root>/src/`. The source docs are organized as described in the project's CLAUDE.md lookup table.
+
+2. If the answer still cannot be found in cards or documentation — particularly for troubleshooting, understanding internal behavior, or verifying undocumented edge cases — inspect the chezmoi source code in the upstream repository at `https://github.com/twpayne/chezmoi`. Use `WebFetch` to read relevant Go source files (e.g. `internal/cmd/`, `internal/chezmoi/`) to find the ground truth.
+
+## Important context about chezmoi
+
+- chezmoi manages dotfiles across multiple machines using a source-state model
+- Source directory: `~/.local/share/chezmoi` (default)
+- Config file: `~/.config/chezmoi/chezmoi.toml` (TOML/YAML/JSON supported)
+- Templates use Go's `text/template` syntax extended with sprig functions
+- File naming in source state encodes attributes (dot_, private_, executable_, encrypted_, etc.)
+- Scripts prefixed with `run_` execute on `chezmoi apply`
+- External files from URLs via `.chezmoiexternal.toml`
+- Password manager integration via template functions
